@@ -4,6 +4,7 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.example.apiedra.webservice.database.DatabaseManager;
 import com.example.apiedra.webservice.modelo.Clima;
 import com.example.apiedra.webservice.service.ServiceController;
 import com.example.apiedra.webservice.utils.GeneralFunctions;
@@ -80,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements Response.Listener
                 getSupportFragmentManager()
                         .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
+        DatabaseManager.init(this);
 
 
     }
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements Response.Listener
         temperatura = (TextView) findViewById(R.id.temperatura);
         humedad = (TextView) findViewById(R.id.humedad);
         descripcion = (TextView) findViewById(R.id.descripcion);
+
     }
 
     public String GetIcon(String weatherMain) {
@@ -298,7 +301,20 @@ public class MainActivity extends AppCompatActivity implements Response.Listener
     @Override
     public void onMapLongClick(LatLng latLng) {
 
+        mMap.clear();
+        LatLng cali = new LatLng(latLng.latitude, latLng.longitude);
+        mMap.addMarker(new MarkerOptions()
+                .position(cali)
+                .title("Cali la Sucursal del cielo"));
 
+        CameraPosition cameraPosition = CameraPosition.builder()
+                .target(cali)
+                .zoom(10)
+                .build();
+
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        mMap.setOnMapLongClickListener(this);
         callWebService(latLng.latitude, latLng.longitude);
     }
 }
